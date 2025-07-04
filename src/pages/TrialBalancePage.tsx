@@ -31,18 +31,31 @@ const TrialBalancePage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get<{
-        balances: Balance[];
-        totalDebit: number;
-        totalCredit: number;
-        balanced: boolean;
-      }>('/api/accounts/trial-balance', {
+      const res = await axios.get('/api/accounts/trial-balance', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setBalances(res.data.balances);
-      setTotalDebit(res.data.totalDebit);
-      setTotalCredit(res.data.totalCredit);
-      setBalanced(res.data.balanced);
+      const data = res.data;
+      if (
+        data &&
+        typeof data === 'object' &&
+        Array.isArray((data as any).balances) &&
+        typeof (data as any).totalDebit === 'number' &&
+        typeof (data as any).totalCredit === 'number' &&
+        typeof (data as any).balanced === 'boolean'
+      ) {
+        const safeData = data as { balances: Balance[]; totalDebit: number; totalCredit: number; balanced: boolean };
+        setBalances(safeData.balances);
+        setTotalDebit(safeData.totalDebit);
+        setTotalCredit(safeData.totalCredit);
+        setBalanced(safeData.balanced);
+      } else {
+        setBalances([]);
+        setTotalDebit(0);
+        setTotalCredit(0);
+        setBalanced(false);
+        setError('Unexpected response from server');
+        console.error('Expected balances array, got:', data);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch trial balance');
     } finally {
