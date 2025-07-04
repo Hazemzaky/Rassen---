@@ -68,8 +68,14 @@ const InventoryRegisterPage: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get<InventoryItem[]>('/api/inventory/items');
-      setItems(res.data);
+      const res = await axios.get('/api/inventory/items');
+      if (Array.isArray(res.data)) {
+        setItems(res.data);
+      } else {
+        setItems([]);
+        setError('Unexpected response from server');
+        console.error('Expected array, got:', res.data);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch inventory');
     } finally {
