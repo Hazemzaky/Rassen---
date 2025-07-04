@@ -69,10 +69,16 @@ const LeavePage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get<Leave[]>('/api/leave', {
+      const res = await axios.get('/api/leave', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setLeaves(res.data as Leave[]);
+      if (Array.isArray(res.data)) {
+        setLeaves(res.data);
+      } else {
+        setLeaves([]);
+        setError('Unexpected response from server');
+        console.error('Expected array, got:', res.data);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch leaves');
     } finally {
