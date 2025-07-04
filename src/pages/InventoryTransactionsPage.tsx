@@ -56,8 +56,14 @@ const InventoryTransactionsPage: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get<InventoryTransaction[]>('/api/inventory/transactions');
-      setTransactions(res.data);
+      const res = await axios.get('/api/inventory/transactions');
+      if (Array.isArray(res.data)) {
+        setTransactions(res.data);
+      } else {
+        setTransactions([]);
+        setError('Unexpected response from server');
+        console.error('Expected array, got:', res.data);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch transactions');
     } finally {
@@ -67,7 +73,12 @@ const InventoryTransactionsPage: React.FC = () => {
   const fetchItems = async () => {
     try {
       const res = await axios.get('/api/inventory/items');
-      setItems(res.data as any[]);
+      if (Array.isArray(res.data)) {
+        setItems(res.data as any[]);
+      } else {
+        setItems([]);
+        console.error('Expected array, got:', res.data);
+      }
     } catch {}
   };
 
