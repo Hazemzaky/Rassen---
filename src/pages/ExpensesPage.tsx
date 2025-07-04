@@ -112,9 +112,12 @@ const ExpensesPage: React.FC = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [periodLocked, setPeriodLocked] = useState(false);
 
+  // Defensive: ensure expenses is always an array
+  const safeExpenses = Array.isArray(expenses) ? expenses : [];
+
   // Helper to filter expenses by date range
   const filterExpensesByRange = (start: Date, end: Date) => {
-    return expenses.filter(exp => {
+    return safeExpenses.filter(exp => {
       const d = new Date(exp.date);
       return d >= start && d <= end;
     });
@@ -309,7 +312,7 @@ const ExpensesPage: React.FC = () => {
   }
 
   // Sort expenses
-  const sortedExpenses = [...expenses].sort((a, b) => {
+  const sortedExpenses = [...safeExpenses].sort((a, b) => {
     let aVal: any, bVal: any;
     switch (sortBy) {
       case 'amount':
