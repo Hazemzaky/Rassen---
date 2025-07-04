@@ -5,6 +5,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
+import API_BASE from '../apiBase';
 
 interface Payroll {
   _id: string;
@@ -51,6 +52,9 @@ const PayrollPage: React.FC = () => {
   const [periods, setPeriods] = useState<Period[]>([]);
   const [periodLocked, setPeriodLocked] = useState(false);
 
+  // Defensive: ensure payrolls is always an array
+  const safePayrolls = Array.isArray(payrolls) ? payrolls : [];
+
   useEffect(() => {
     fetchPayrolls();
     fetchEmployees();
@@ -72,7 +76,7 @@ const PayrollPage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('/api/payrolls', {
+      const res = await axios.get(`${API_BASE}/api/payrolls`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (Array.isArray(res.data)) {
@@ -92,7 +96,7 @@ const PayrollPage: React.FC = () => {
   const fetchEmployees = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get<{ _id: string; name: string }[]>('/api/employees', {
+      const res = await axios.get<{ _id: string; name: string }[]>(`${API_BASE}/api/employees`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setEmployees(res.data as { _id: string; name: string }[]);
@@ -102,7 +106,7 @@ const PayrollPage: React.FC = () => {
   const fetchPeriods = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get<Period[]>('/api/periods', {
+      const res = await axios.get<Period[]>(`${API_BASE}/api/periods`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPeriods(res.data);
@@ -110,7 +114,7 @@ const PayrollPage: React.FC = () => {
   };
 
   const filteredPayrolls = useMemo(() => {
-    let data = payrolls;
+    let data = safePayrolls;
     if (search.trim()) {
       const s = search.trim().toLowerCase();
       data = data.filter(p =>
@@ -120,7 +124,7 @@ const PayrollPage: React.FC = () => {
       );
     }
     return data;
-  }, [payrolls, search]);
+  }, [safePayrolls, search]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -146,7 +150,7 @@ const PayrollPage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      await axios.post('/api/payroll', {
+      await axios.post(`${API_BASE}/api/payroll`, {
         ...form,
         baseSalary: Number(form.baseSalary),
         benefits: Number(form.benefits),
