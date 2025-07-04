@@ -68,10 +68,16 @@ const JournalEntriesPage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get<Entry[]>('/api/journal-entries', {
+      const res = await axios.get('/api/journal-entries', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setEntries(res.data);
+      if (Array.isArray(res.data)) {
+        setEntries(res.data);
+      } else {
+        setEntries([]);
+        setError('Unexpected response from server');
+        console.error('Expected array, got:', res.data);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch journal entries');
     } finally {
