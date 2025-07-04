@@ -6,6 +6,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import axios from 'axios';
+import API_BASE from '../apiBase';
 
 interface Income {
   _id: string;
@@ -51,7 +52,7 @@ const IncomePage: React.FC = () => {
     const fetchPeriods = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get<Period[]>('/api/periods', {
+        const res = await axios.get<Period[]>(`${API_BASE}/api/periods`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setPeriods(res.data);
@@ -76,7 +77,7 @@ const IncomePage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get<Income[]>('/api/expenses/income', {
+      const res = await axios.get<Income[]>(`${API_BASE}/api/expenses/income`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (Array.isArray(res.data)) {
@@ -115,12 +116,12 @@ const IncomePage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      await axios.post('/api/expenses/income', form, {
+      await axios.post(`${API_BASE}/api/expenses/income`, form, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSuccess('Income record added successfully!');
       // Defensive refetch
-      const res = await axios.get<Income[]>('/api/expenses/income', {
+      const res = await axios.get<Income[]>(`${API_BASE}/api/expenses/income`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (Array.isArray(res.data)) {
