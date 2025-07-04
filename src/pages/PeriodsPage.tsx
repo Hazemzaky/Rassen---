@@ -30,10 +30,16 @@ const PeriodsPage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get<Period[]>('/api/periods', {
+      const res = await axios.get('/api/periods', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setPeriods(res.data as Period[]);
+      if (Array.isArray(res.data)) {
+        setPeriods(res.data);
+      } else {
+        setPeriods([]);
+        setError('Unexpected response from server');
+        console.error('Expected array, got:', res.data);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch periods');
     } finally {
