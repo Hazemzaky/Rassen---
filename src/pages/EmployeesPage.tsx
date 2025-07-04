@@ -60,10 +60,16 @@ const EmployeesPage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get<Employee[]>('/api/employees', {
+      const res = await axios.get('/api/employees', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setEmployees(res.data as Employee[]);
+      if (Array.isArray(res.data)) {
+        setEmployees(res.data);
+      } else {
+        setEmployees([]);
+        setError('Unexpected response from server');
+        console.error('Expected array, got:', res.data);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch employees');
     } finally {
