@@ -126,6 +126,15 @@ const PayrollPage: React.FC = () => {
     return data;
   }, [safePayrolls, search]);
 
+  // Top-level guard: if filteredPayrolls is not an array, show error
+  if (!Array.isArray(filteredPayrolls)) {
+    return (
+      <Box p={3}>
+        <Alert severity="error">Unexpected error: payroll data is not an array.</Alert>
+      </Box>
+    );
+  }
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
@@ -226,7 +235,7 @@ const PayrollPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredPayrolls.map((p, idx) => (
+                {(Array.isArray(filteredPayrolls) ? filteredPayrolls : []).map((p, idx) => (
                   <TableRow key={p._id} sx={{ background: idx % 2 === 0 ? '#fafafa' : '#fff' }}>
                     <TableCell>{p.employee?.name || '-'}</TableCell>
                     <TableCell>{p.period}</TableCell>
