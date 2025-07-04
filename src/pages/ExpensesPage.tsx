@@ -145,7 +145,13 @@ const ExpensesPage: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log('API response:', res.data);
-        setExpenses(res.data);
+        if (Array.isArray(res.data)) {
+          setExpenses(res.data);
+        } else {
+          setExpenses([]);
+          setError('Unexpected response from server');
+          console.error('Expected array, got:', res.data);
+        }
       } catch (err: any) {
         console.error('API error:', err);
         setError(err.response?.data?.message || 'Failed to fetch expenses');
@@ -245,7 +251,13 @@ const ExpensesPage: React.FC = () => {
       const res = await axios.get<Expense[]>('/api/expenses', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setExpenses(res.data);
+      if (Array.isArray(res.data)) {
+        setExpenses(res.data);
+      } else {
+        setExpenses([]);
+        setError('Unexpected response from server');
+        console.error('Expected array, got:', res.data);
+      }
       handleClose();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to add expense');
