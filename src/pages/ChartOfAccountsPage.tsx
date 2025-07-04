@@ -42,10 +42,16 @@ const ChartOfAccountsPage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get<Account[]>('/api/accounts', {
+      const res = await axios.get('/api/accounts', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setAccounts(res.data);
+      if (Array.isArray(res.data)) {
+        setAccounts(res.data);
+      } else {
+        setAccounts([]);
+        setError('Unexpected response from server');
+        console.error('Expected array, got:', res.data);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch accounts');
     } finally {
