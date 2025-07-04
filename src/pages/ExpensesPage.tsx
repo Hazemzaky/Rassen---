@@ -6,6 +6,7 @@ import {
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DialogContentText from '@mui/material/DialogContentText';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import API_BASE from '../apiBase';
 
 interface Expense {
   _id: string;
@@ -141,7 +142,7 @@ const ExpensesPage: React.FC = () => {
       try {
         const token = localStorage.getItem('token');
         console.log('Token:', token ? 'Present' : 'Missing');
-        const res = await axios.get<Expense[]>('/api/expenses', {
+        const res = await axios.get<Expense[]>(`${API_BASE}/api/expenses`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log('API response:', res.data);
@@ -163,7 +164,7 @@ const ExpensesPage: React.FC = () => {
     const fetchPeriods = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get<Period[]>('/api/periods', {
+        const res = await axios.get<Period[]>(`${API_BASE}/api/periods`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setPeriods(res.data);
@@ -240,7 +241,7 @@ const ExpensesPage: React.FC = () => {
       if (userId) {
         formData.append('user', userId);
       }
-      await axios.post('/api/expenses', formData, {
+      await axios.post(`${API_BASE}/api/expenses`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
@@ -248,7 +249,7 @@ const ExpensesPage: React.FC = () => {
       });
       // Refresh expenses
       setLoading(true);
-      const res = await axios.get<Expense[]>('/api/expenses', {
+      const res = await axios.get<Expense[]>(`${API_BASE}/api/expenses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (Array.isArray(res.data)) {
