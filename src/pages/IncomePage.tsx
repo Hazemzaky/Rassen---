@@ -79,7 +79,13 @@ const IncomePage: React.FC = () => {
       const res = await axios.get<Income[]>('/api/expenses/income', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setIncome(res.data);
+      if (Array.isArray(res.data)) {
+        setIncome(res.data);
+      } else {
+        setIncome([]);
+        setError('Unexpected response from server');
+        console.error('Expected array, got:', res.data);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch income records');
     } finally {
@@ -113,7 +119,17 @@ const IncomePage: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSuccess('Income record added successfully!');
-      fetchIncome();
+      // Defensive refetch
+      const res = await axios.get<Income[]>('/api/expenses/income', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (Array.isArray(res.data)) {
+        setIncome(res.data);
+      } else {
+        setIncome([]);
+        setError('Unexpected response from server');
+        console.error('Expected array, got:', res.data);
+      }
       handleClose();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to add income');
