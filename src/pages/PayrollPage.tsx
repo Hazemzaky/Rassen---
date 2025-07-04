@@ -72,10 +72,16 @@ const PayrollPage: React.FC = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get<Payroll[]>('/api/payroll', {
+      const res = await axios.get('/api/payrolls', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setPayrolls(res.data as Payroll[]);
+      if (Array.isArray(res.data)) {
+        setPayrolls(res.data);
+      } else {
+        setPayrolls([]);
+        setError('Unexpected response from server');
+        console.error('Expected array, got:', res.data);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to fetch payrolls');
     } finally {
